@@ -12,7 +12,7 @@ const Landing: React.FC = () => {
             alignItems: 'center',
             background: '#f5f7fa'
         }}>
-            <h1>Welcome to CMS Client</h1>
+            <h1>Welcome to CMS</h1>
             <p>Your content management solution starts here.</p>
             <button
                 style={{
