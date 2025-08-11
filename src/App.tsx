@@ -4,17 +4,23 @@ import './App.css'
 type User = {
   id: number
   username: string
-  // add other fields if needed
+  password: string // added since API includes it
 }
 
 async function getCredentials(): Promise<User[]> {
-  const res = await fetch('https://localhost:5001/api/credentials', {
+  const res = await fetch('https://localhost:7108/api/Credentials/GetAll', {
     method: 'GET',
     headers: { Accept: 'application/json' },
   })
   if (!res.ok) throw new Error(`HTTP ${res.status}`)
-  const data: User[] = await res.json()
-  return data
+
+  const data = await res.json()
+
+  if (!Array.isArray(data.value)) {
+    throw new Error('API did not return an array in "value"')
+  }
+
+  return data.value
 }
 
 function App() {
@@ -43,12 +49,14 @@ function App() {
 
       {error && <p style={{ color: 'red' }}>{error}</p>}
 
-      {users && (
+      {Array.isArray(users) && users.length > 0 && (
         <>
           <p>IDs: {users.map(u => u.id).join(', ')}</p>
           <ul>
             {users.map(u => (
-              <li key={u.id}>{u.username}</li>
+              <li key={u.id}>
+                {u.username}
+              </li>
             ))}
           </ul>
         </>
