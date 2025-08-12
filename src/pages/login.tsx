@@ -1,20 +1,12 @@
-import React from 'react';
 
 const Login: React.FC = () => {
     return (
-        <div style={{
-            minHeight: '100vh',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            background: '#fff'
-        }}>
-            <h2>Login</h2>
-            <form style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '300px' }}>
-                <input type="text" placeholder="Username" style={{ padding: '8px', fontSize: '1rem' }} />
-                <input type="password" placeholder="Password" style={{ padding: '8px', fontSize: '1rem' }} />
-                <button type="submit" style={{ padding: '10px 24px', fontSize: '1rem', borderRadius: '4px', border: 'none', background: '#0078d4', color: '#fff', cursor: 'pointer' }}>
+        <div className="min-h-screen flex flex-col justify-center items-center bg-white">
+            <h2 className="text-2xl font-bold mb-6">Login</h2>
+            <form className="flex flex-col gap-3 w-72">
+                <input type="text" placeholder="Username" className="p-2 text-base border rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                <input type="password" placeholder="Password" className="p-2 text-base border rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
+                <button type="submit" className="px-6 py-2 text-base rounded bg-blue-600 text-white hover:bg-blue-700 transition-colors mt-2">
                     Login
                 </button>
             </form>
