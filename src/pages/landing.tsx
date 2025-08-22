@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LineChart, Newspaper, Sparkles, UtensilsCrossed } from "lucide-react";
+import { FaChartLine, FaNewspaper, FaUtensils } from "react-icons/fa";
+import { IoSparkles } from "react-icons/io5";
 
 const Landing: React.FC = () => {
     const features = [
@@ -9,7 +10,7 @@ const Landing: React.FC = () => {
         { title: 'Specials', description: 'Manage your specials and promotions effortlessly.' },
         { title: 'Menu', description: 'Edit and update your menu items in real-time.' },
     ];
-    const featureIcons = [<LineChart />, <Newspaper />, <Sparkles />, <UtensilsCrossed />];
+    const featureIcons = [<FaChartLine />, <FaNewspaper />, <IoSparkles />, <FaUtensils />];
 
     const navigate = useNavigate();
     return (

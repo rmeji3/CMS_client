@@ -1,4 +1,5 @@
-import {Lock} from 'lucide-react';
+import { FaLock } from "react-icons/fa";
+
 const Login: React.FC = () => {
     return (
         <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">
@@ -16,7 +17,7 @@ const Login: React.FC = () => {
                 <input type="password" placeholder="Password" className="p-2 text-base border  border-gray-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" />
               
                     <button type="submit" className="px-6 py-2 flex justify-center items-center gap-2 text-base font-bold rounded text-white bg-gradient-to-r from-purple-500 via-blue-500 to-blue-400 bg-[length:200%_200%] bg-left transition-all duration-700 ease-in-out hover:bg-right shadow-lg cursor-pointer">
-                     <span > <Lock className = "h-[20px] w-[20px]"/></span>
+                     <span > <FaLock className = "h-[20px] w-[20px]"/></span>
                     Sign In 
                     </button>
             </form>
