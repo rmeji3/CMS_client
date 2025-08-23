@@ -13,7 +13,11 @@ function getXsrfCookie(): string {
     ?.substring(k.length) ?? "";
 }
 
-const Navbar: React.FC = () => {
+interface NavbarProps {
+  onLogout: () => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -44,12 +48,13 @@ const Navbar: React.FC = () => {
       await fetch(`${API}/auth/logout`, {
         method: "POST",
         credentials: "include",
-        headers: { "X-CSRF-TOKEN": getXsrfCookie() }, 
+        headers: { "X-CSRF-TOKEN": getXsrfCookie() },
       });
     } catch (e) {
       console.error("Logout failed:", e);
     } finally {
       setIsLoggedIn(false);
+      onLogout();
       navigate("/login", { replace: true });
     }
   };
@@ -57,21 +62,27 @@ const Navbar: React.FC = () => {
   return (
     <nav className="flex justify-between items-center px-8 py-4 top-0 bg-gray-100">
       <div className="font-bold text-xl">
-        <Link to="/" className="no-underline">CMS Client</Link>
-      </div>
-      <span className="flex items-center gap-6">
-        <Link to="/" className="no-underline font-medium hover:underline">Home</Link>
         {isLoggedIn ? (
-          <button className="h-[40px] w-[140px] group relative px-6 py-2 text-base rounded-lg font-semibold text-white z-10 overflow-visible bg-gradient-to-r from-purple-500 via-blue-500 to-blue-400 bg-[length:200%_200%] bg-left transition-all duration-700 hover:bg-right shadow-lg cursor-pointer"
-                  onClick={handleLogout}>
-            <span className="absolute -inset-4 rounded-2xl bg-gradient-to-r from-purple-500 via-blue-500 to-blue-400 opacity-0 blur-2xl pointer-events-none transition-all duration-700 group-hover:opacity-40"></span>
-			<div className="flex justify-center items-center gap-2">
-				<IoIosLogOut className="h-[20px] w-[20px] z-10" />
-				<span className="relative z-10">Logout</span>
-			</div>
-            
-            <span className="absolute inset-0 rounded-lg bg-gradient-to-r from-purple-500 via-blue-500 to-blue-400 opacity-70 blur-sm transition-all duration-700 group-hover:opacity-100 pointer-events-none"></span>
-          </button>
+            <span className="pointer-events-none">CMS Client</span>
+        ) : (
+          <Link to="/" className="no-underline">CMS Client</Link>
+        )}
+      </div>
+      <div className="flex items-center gap-6">
+        {isLoggedIn ? (
+          <>
+            <Link to="/" className="no-underline font-medium hover:underline">Home</Link>
+            <Link to="/account" className="no-underline font-medium hover:underline">Account</Link>
+            <button className="h-[40px] w-[140px] group relative px-6 py-2 text-base rounded-lg font-semibold text-white z-10 overflow-visible bg-gradient-to-r from-purple-500 via-blue-500 to-blue-400 bg-[length:200%_200%] bg-left transition-all duration-700 hover:bg-right shadow-lg cursor-pointer"
+                    onClick={handleLogout}>
+              <span className="absolute -inset-4 rounded-2xl bg-gradient-to-r from-purple-500 via-blue-500 to-blue-400 opacity-0 blur-2xl pointer-events-none transition-all duration-700 group-hover:opacity-40"></span>
+                <div className="flex justify-center items-center gap-2">
+                  <IoIosLogOut className="h-[20px] w-[20px] z-10" />
+                  <span className="relative z-10">Logout</span>
+                </div>
+              <span className="absolute inset-0 rounded-lg bg-gradient-to-r from-purple-500 via-blue-500 to-blue-400 opacity-70 blur-sm transition-all duration-700 group-hover:opacity-100 pointer-events-none"></span>
+            </button>
+          </>
         ) : (
           <button className="h-[40px] w-[100px] group relative px-6 py-2 text-base rounded-lg font-semibold text-white z-10 overflow-visible bg-gradient-to-r from-purple-500 via-blue-500 to-blue-400 bg-[length:200%_200%] bg-left transition-all duration-700 hover:bg-right shadow-lg cursor-pointer"
                   onClick={() => navigate("/login")}>

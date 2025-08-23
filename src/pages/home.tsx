@@ -15,7 +15,7 @@ const Home: React.FC = () => {
                         "Authorization": `${tokenType} ${token}`,
                         "Content-Type": "application/json",
                     },
-                    credentials: "include", // Include cookies if needed
+                    credentials: "include", // Include cookies
                 });
 
                 if (!response.ok) {
