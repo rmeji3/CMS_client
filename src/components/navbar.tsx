@@ -44,7 +44,7 @@ const Navbar: React.FC = () => {
       await fetch(`${API}/auth/logout`, {
         method: "POST",
         credentials: "include",
-        headers: { "X-CSRF-TOKEN": getXsrfCookie() }, // ✅ CSRF header
+        headers: { "X-CSRF-TOKEN": getXsrfCookie() }, 
       });
     } catch (e) {
       console.error("Logout failed:", e);
@@ -59,7 +59,7 @@ const Navbar: React.FC = () => {
       <div className="font-bold text-xl">
         <Link to="/" className="no-underline">CMS Client</Link>
       </div>
-      <div className="flex items-center gap-6">
+      <span className="flex items-center gap-6">
         <Link to="/" className="no-underline font-medium hover:underline">Home</Link>
         {isLoggedIn ? (
           <button className="h-[40px] w-[140px] group relative px-6 py-2 text-base rounded-lg font-semibold text-white z-10 overflow-visible bg-gradient-to-r from-purple-500 via-blue-500 to-blue-400 bg-[length:200%_200%] bg-left transition-all duration-700 hover:bg-right shadow-lg cursor-pointer"
@@ -80,7 +80,7 @@ const Navbar: React.FC = () => {
             <span className="absolute inset-0 rounded-lg bg-gradient-to-r from-purple-500 via-blue-500 to-blue-400 opacity-70 blur-sm transition-all duration-700 group-hover:opacity-100 pointer-events-none"></span>
           </button>
         )}
-      </div>
+      </span>
     </nav>
   );
 };
