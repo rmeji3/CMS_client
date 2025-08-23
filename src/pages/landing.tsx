@@ -39,22 +39,20 @@ const Landing: React.FC = () => {
             </section>
 
             {/* features cards */}
-            <section className='flex gap-8'>
-                <ul className='flex gap-8'>
-                {features.map((feature, index) => (
-                    <li key={index} className="relative group w-[300px]">
-                        {/* Glow sits behind the card */}
-                        <div className="relative z-10 flex flex-col border border-gray-300 p-6 rounded-md drop-shadow-lg bg-white gap-2 transition-shadow duration-500">
-                            <div className='flex items-center gap-3'>
-                                <span className="text-2xl">{featureIcons[index]}</span>
-                                <h2 className="text-2xl font-semibold">{feature.title}</h2>
-                            </div>
-                            <p className="text-lg text-gray-600">{feature.description}</p>
+            <ul className='flex gap-8'>
+            {features.map((feature, index) => (
+                <li key={index} className="relative group w-[300px]">
+                    {/* Glow sits behind the card */}
+                    <div className="relative z-10 flex flex-col border border-gray-300 p-6 rounded-md drop-shadow-lg bg-white gap-2 transition-shadow duration-500">
+                        <div className='flex items-center gap-3'>
+                            <span className="text-2xl">{featureIcons[index]}</span>
+                            <h2 className="text-2xl font-semibold">{feature.title}</h2>
                         </div>
-                    </li>
-                ))}
-                </ul>
-            </section>
+                        <p className="text-lg text-gray-600">{feature.description}</p>
+                    </div>
+                </li>
+            ))}
+            </ul>
 
             {/* footer */}
             <footer className='flex flex-col items-center gap-6 mb-20 z-10'>
