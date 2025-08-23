@@ -16,7 +16,7 @@ function App() {
   return (
     <Router>
       <Navbar />
-      <div className="relative min-h-screen overflow-x-hidden bg-gray-100">
+      <main className="relative min-h-screen overflow-x-hidden bg-gray-100">
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
@@ -29,7 +29,7 @@ function App() {
             }
           />
         </Routes>
-      </div>
+      </main>
     </Router>
   );
 }
