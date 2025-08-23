@@ -45,6 +45,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
 
   const handleLogout = async () => {
     try {
+      // Send CSRF token header for security (required by backend)
       await fetch(`${API}/auth/logout`, {
         method: "POST",
         credentials: "include",
