@@ -91,7 +91,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
             <span className="absolute inset-0 rounded-lg bg-gradient-to-r from-purple-500 via-blue-500 to-blue-400 opacity-70 blur-sm transition-all duration-700 group-hover:opacity-100 pointer-events-none"></span>
           </button>
         )}
-      </div>
+      </span>
     </nav>
   );
 };
