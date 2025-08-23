@@ -13,7 +13,11 @@ function getXsrfCookie(): string {
     ?.substring(k.length) ?? "";
 }
 
-const Navbar: React.FC = () => {
+interface NavbarProps {
+  onLogout: () => void;
+}
+
+const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -50,6 +54,7 @@ const Navbar: React.FC = () => {
       console.error("Logout failed:", e);
     } finally {
       setIsLoggedIn(false);
+      onLogout();
       navigate("/login", { replace: true });
     }
   };
@@ -58,7 +63,7 @@ const Navbar: React.FC = () => {
     <nav className="flex justify-between items-center px-8 py-4 top-0 bg-gray-100">
       <div className="font-bold text-xl">
         {isLoggedIn ? (
-          <p className="no-underline">CMS Client</p>
+            <span className="pointer-events-none">CMS Client</span>
         ) : (
           <Link to="/" className="no-underline">CMS Client</Link>
         )}
@@ -66,7 +71,7 @@ const Navbar: React.FC = () => {
       <div className="flex items-center gap-6">
         {isLoggedIn ? (
           <>
-            <Link to="/home" className="no-underline font-medium hover:underline">Home</Link>
+            <Link to="/" className="no-underline font-medium hover:underline">Home</Link>
             <Link to="/account" className="no-underline font-medium hover:underline">Account</Link>
             <button className="h-[40px] w-[140px] group relative px-6 py-2 text-base rounded-lg font-semibold text-white z-10 overflow-visible bg-gradient-to-r from-purple-500 via-blue-500 to-blue-400 bg-[length:200%_200%] bg-left transition-all duration-700 hover:bg-right shadow-lg cursor-pointer"
                     onClick={handleLogout}>

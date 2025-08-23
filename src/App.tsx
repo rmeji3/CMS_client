@@ -1,9 +1,11 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
 
 // Importing pages
 import Landing from './pages/landing';
 import Login from './pages/login';
 import Home from './pages/home';
+import Account from './pages/account';
 
 // Importing components
 import Navbar from './components/navbar';
@@ -13,12 +15,36 @@ import './App.css';
 
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const res = await fetch("https://localhost:7108/Profile/me", {
+          credentials: "include",
+        });
+        setIsLoggedIn(res.ok);
+      } catch (error) {
+        console.error("Session check failed:", error);
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkSession();
+  }, []);
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    navigate("/login", { replace: true });
+  };
+
   return (
-    <Router>
-      <Navbar />
+    <>
+      <Navbar onLogout={handleLogout} />
       <div className="relative min-h-screen overflow-x-hidden bg-gray-100">
         <Routes>
-          <Route path="/" element={<Landing />} />
+          <Route path="/" element={isLoggedIn ? <Home /> : <Landing />} />
           <Route path="/login" element={<Login />} />
           <Route
             path="/home"
@@ -28,9 +54,17 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/account"
+            element={
+              <ProtectedRoute>
+                <Account />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </div>
-    </Router>
+    </>
   );
 }
 
