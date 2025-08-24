@@ -26,9 +26,11 @@ const AccountPage: React.FC = () => {
                 }
 
                 const data = await response.json();
-                setEmail(data.email);
-                setFirstName(data.firstName);
-                setLastName(data.lastName);
+                setEmail(data.email || "N/A");
+                console.log("Fetched email:", data.email);
+                setFirstName(data.firstName || "N/A");
+                setLastName(data.lastName || "N/A");
+                console.log("Fetched name:", data.firstName, data.lastName);
                 setProfilePicture(data.profilePicture);
             } catch (error) {
                 console.error("Error fetching user data:", error);
