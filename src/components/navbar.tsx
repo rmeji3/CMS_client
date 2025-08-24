@@ -72,7 +72,7 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
       <div className="flex items-center gap-6">
         {isLoggedIn ? (
           <>
-            <Link to="/" className="no-underline font-medium hover:underline">Home</Link>
+            <Link to="/home" className="no-underline font-medium hover:underline">Home</Link>
             <Link to="/account" className="no-underline font-medium hover:underline">Account</Link>
             <button className="h-[40px] w-[140px] group relative px-6 py-2 text-base rounded-lg font-semibold text-white z-10 overflow-visible bg-gradient-to-r from-purple-500 via-blue-500 to-blue-400 bg-[length:200%_200%] bg-left transition-all duration-700 hover:bg-right shadow-lg cursor-pointer"
                     onClick={handleLogout}>
