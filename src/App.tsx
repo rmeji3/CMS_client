@@ -1,4 +1,4 @@
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import { useEffect, useState } from "react";
 
 // Importing pages
@@ -15,7 +15,7 @@ import './App.css';
 
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,12 +39,19 @@ function App() {
     navigate("/login", { replace: true });
   };
 
+  if (isLoggedIn === null) {
+    return <div>Loading...</div>; // Show a loading state while checking session
+  }
+
   return (
     <>
       <Navbar onLogout={handleLogout} />
       <div className="relative min-h-screen overflow-x-hidden bg-gray-100">
         <Routes>
-          <Route path="/" element={isLoggedIn ? <Home /> : <Landing />} />
+          <Route
+            path="/"
+            element={isLoggedIn ? <Navigate to="/home" replace /> : <Landing />}
+          />
           <Route path="/login" element={<Login />} />
           <Route
             path="/home"
