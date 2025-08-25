@@ -11,37 +11,49 @@ import Account from './pages/account';
 import Navbar from './components/navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 
+import { useFetchProfileQuery, profileApi } from "./services/profile";
+import { useLogoutMutation } from "./services/auth";
+import { antiforgeryApi } from "./services/antiforgery";
+import { authApi } from "./services/auth";
+import { clearAntiForgeryStorage } from "./services/csrf";
+import { useDispatch } from "react-redux";
+
 import './App.css';
 
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { data: profileData, isLoading, refetch } = useFetchProfileQuery();
+  const [logout] = useLogoutMutation();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const res = await fetch("https://localhost:7108/Profile/me", {
-          credentials: "include",
-        });
-        setIsLoggedIn(res.ok);
-      } catch (error) {
-        console.error("Session check failed:", error);
-        setIsLoggedIn(false);
-      }
-    };
-
-    checkSession();
+    // Refetch profile data on mount
+    refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    navigate("/login", { replace: true });
+  const handleLogout = async () => {
+    if (isLoggingOut) return; // Prevent multiple logout attempts
+    setIsLoggingOut(true);
+    try {
+      // Try to notify server, but UI state should be cleared regardless of outcome
+      await logout().unwrap();
+    } catch (e) {
+      // Swallow errors; UI state is cleared in finally
+    } finally {
+      // Always clear client auth-related state
+      try { clearAntiForgeryStorage(); } catch {}
+      dispatch(profileApi.util.resetApiState());
+      dispatch(authApi.util.resetApiState());
+      dispatch(antiforgeryApi.util.resetApiState());
+      setIsLoggingOut(false);
+      navigate("/login", { replace: true });
+    }
   };
 
-  if (isLoggedIn === null) {
-    return <div>Loading...</div>; // Show a loading state while checking session
-  }
+  if (isLoading) return <div>Loading...</div>; // Show a loading state while checking session
 
   return (
     <>
@@ -50,7 +62,7 @@ function App() {
         <Routes>
           <Route
             path="/"
-            element={isLoggedIn ? <Navigate to="/home" replace /> : <Landing />}
+            element={profileData ? <Navigate to="/home" replace /> : <Landing />}
           />
           <Route path="/login" element={<Login />} />
           <Route

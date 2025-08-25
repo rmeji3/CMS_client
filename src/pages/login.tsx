@@ -1,63 +1,32 @@
 import { useState, useEffect } from "react";
 import { FaLock } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
-const API = "https://localhost:7108";
+import { useLoginMutation } from "../services/auth";
+import { useFetchProfileQuery } from "../services/profile";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [login, { isLoading, error }] = useLoginMutation();
+  const { data: profile, isFetching } = useFetchProfileQuery();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const res = await fetch(`${API}/Profile/me`, { credentials: "include" });
-        if (res.ok) {
-          navigate("/home", { replace: true }); // Redirect if already logged in
-        }
-      } catch (error) {
-        console.error("Session check failed:", error);
-      }
-    };
-
-    checkSession();
-  }, [navigate]);
+    if (!isFetching && profile) {
+      navigate("/home", { replace: true }); // Redirect if already logged in
+    }
+  }, [profile, isFetching, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
 
     try {
-      // (Optional) bootstrap CSRF cookie once per session
-      await fetch(`${API}/antiforgery/token`, { credentials: "include" });
-
-      const res = await fetch(`${API}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include", // send/receive cookies
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!res.ok) {
-        const msg = await res.text();
-        throw new Error(msg || "Invalid credentials");
-      }
-
-      // sanity check: verify the cookie works
-      const me = await fetch(`${API}/Profile/me`, { credentials: "include" });
-      if (!me.ok) throw new Error("Authenticated check failed");
-
+      await login({ email, password }).unwrap();
       navigate("/home", { replace: true });
-    } catch (err: any) {
-      setError(err.message || "Login failed");
-    } finally {
-      setLoading(false);
-    }
+  } catch (err: any) {}
   };
+
+  const errorMessage = error && "data" in error ? (error.data as string) : "An error occurred";
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gray-100">
@@ -74,7 +43,7 @@ const Login: React.FC = () => {
           <p className="text-center text-gray-400">Sign In To Manage</p>
         </div>
 
-        {error && <p className="text-red-500 text-center">{error}</p>}
+        {error && <p className="text-red-500 text-center">{errorMessage}</p>}
 
         <label className="font-bold">Email</label>
         <input
@@ -98,11 +67,11 @@ const Login: React.FC = () => {
 
         <button
           type="submit"
-          disabled={loading}
+          disabled={isLoading}
           className="mt-3 px-6 py-2 flex justify-center items-center gap-2 font-bold rounded text-white bg-gradient-to-r from-purple-500 via-blue-500 to-blue-400 bg-[length:200%_200%] bg-left transition-all duration-700 hover:bg-right shadow-lg disabled:opacity-50 cursor-pointer"
         >
           <FaLock className="h-[20px] w-[20px]" />
-          {loading ? "Signing In..." : "Sign In"}
+          {isLoading ? "Signing In..." : "Sign In"}
         </button>
       </form>
     </div>
