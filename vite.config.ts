@@ -12,5 +12,23 @@ export default defineConfig({
     watch: {
       usePolling: true,
     },
+    proxy: {
+      // Proxy backend API to avoid cross-site cookies/SameSite issues in dev
+      '/auth': {
+        target: 'https://localhost:7108',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/Profile': {
+        target: 'https://localhost:7108',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/antiforgery': {
+        target: 'https://localhost:7108',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   }
 })

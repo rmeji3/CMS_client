@@ -1,28 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Navigate } from "react-router-dom";
-
-const API = "https://localhost:7108";
+import { useFetchProfileQuery } from "../services/profile";
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const [ok, setOk] = useState<boolean | null>(null);
+  const { data: profile, isLoading, isSuccess } = useFetchProfileQuery(undefined, { refetchOnMountOrArgChange: true, refetchOnFocus: true, refetchOnReconnect: true });
 
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        await fetch(`${API}/antiforgery/token`, { credentials: "include" });
-        const res = await fetch(`${API}/Profile/me`, { credentials: "include" });
-        if (!mounted) return;
-        setOk(res.ok);
-      } catch (e) {
-        if (!mounted) return;
-        console.error("Auth check failed:", e);
-        setOk(false);
-      }
-    })();
-    return () => { mounted = false; };
-  }, []);
+  if (isLoading) return <div>Loading…</div>;
+  if (!isSuccess || !profile) return <Navigate to="/login" replace />;
 
-  if (ok === null) return <div>Loading…</div>;
-  return ok ? <>{children}</> : <Navigate to="/login" replace />;
+  return <>{children}</>;
 }
