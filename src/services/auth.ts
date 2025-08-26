@@ -7,7 +7,7 @@ import type { Auth } from './types';
 export const authApi = createApi({
   reducerPath: 'authApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: '/',
+    baseUrl: 'https://localhost:7108',
     credentials: 'include', // Include cookies for authentication
     prepareHeaders: (headers) => attachAntiForgeryHeaders(headers),
   }),

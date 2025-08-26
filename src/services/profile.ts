@@ -5,7 +5,7 @@ import type { Profile } from './types';
 export const profileApi = createApi({
   reducerPath: 'profileApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: '/',
+    baseUrl: 'https://localhost:7108',
   credentials: 'include', // Include cookies for authentication
   prepareHeaders: (headers) => attachAntiForgeryHeaders(headers),
   }),
