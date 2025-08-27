@@ -9,9 +9,10 @@ type Props = {
   previewUrl: string | null;
   handleImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   clearImage: () => void;
+  onDirty?: () => void;
 };
 
-const AboutSection: React.FC<Props> = ({ expanded, toggle, selectedImage, previewUrl, handleImageChange, clearImage }) => {
+const AboutSection: React.FC<Props> = ({ expanded, toggle, selectedImage, previewUrl, handleImageChange, clearImage, onDirty }) => {
   return (
     <div className="w-full border-b border-gray-300 pb-2">
       <div
@@ -30,9 +31,18 @@ const AboutSection: React.FC<Props> = ({ expanded, toggle, selectedImage, previe
       >
         <div className="flex flex-col w-full mt-2">
           <label className="font-semibold">Title</label>
-          <input type="text" placeholder="Title" className="border border-gray-300 rounded-lg p-2 w-1/2" />
+          <input
+            type="text"
+            placeholder="Title"
+            className="border border-gray-300 rounded-lg p-2 w-1/2"
+            onChange={onDirty}
+          />
           <label className="font-semibold mt-2">Description</label>
-          <textarea placeholder="Description" className="border border-gray-300 rounded-lg p-2 w-full h-24" />
+          <textarea
+            placeholder="Description"
+            className="border border-gray-300 rounded-lg p-2 w-full h-24"
+            onChange={onDirty}
+          />
 
           {/* Image Preview */}
           {previewUrl && (

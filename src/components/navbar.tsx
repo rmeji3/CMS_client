@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { IoIosLogOut } from "react-icons/io";
 import { useFetchAntiforgeryTokenQuery } from "../services/antiforgery";
@@ -15,10 +15,21 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
   const isLoginRoute = pathname === "/login";
   const { data: profileData, isLoading: profileLoading, isSuccess: profileSuccess, refetch: refetchProfile } = useFetchProfileQuery(isLoginRoute ? (skipToken as any) : undefined, { refetchOnMountOrArgChange: true, refetchOnFocus: true, refetchOnReconnect: true });
   const { isLoading: antiforgeryLoading, refetch: refetchAntiforgery } = useFetchAntiforgeryTokenQuery();
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   useEffect(() => {
     refetchAntiforgery();
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Listen for unsaved-changes state from the editor
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const ce = e as CustomEvent<boolean>;
+      setHasUnsavedChanges(!!ce.detail);
+    };
+    window.addEventListener('unsaved-changes', handler as EventListener);
+    return () => window.removeEventListener('unsaved-changes', handler as EventListener);
   }, []);
 
   useEffect(() => {
@@ -33,6 +44,10 @@ const Navbar: React.FC<NavbarProps> = ({ onLogout }) => {
   }
 
   const handleLogout = async () => {
+    if (hasUnsavedChanges) {
+      const ok = window.confirm('You have unsaved changes. If you log out now, they will be lost. Continue?');
+      if (!ok) return;
+    }
     // Delegate logout flow to parent (App) to avoid double-calls
     onLogout();
   };

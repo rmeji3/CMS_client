@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import ImageWithDescription from './components/ImageWithDescription';
@@ -14,50 +14,83 @@ const Carousel: React.FC<CarouselProps> = ({ setUnsavedChanges }) => {
     const [components, setComponents] = useState<{ id: string; hasImage: boolean; description: string }[]>(
         [{ id: uuidv4(), hasImage: false, description: "" }]
     );
+    const [resetToken, setResetToken] = useState<number>(0);
+    const lastComponentRef = useRef<HTMLDivElement | null>(null);
+    const isResettingRef = useRef<boolean>(false);
+
+    const isDirty = (items: { id: string; hasImage: boolean; description: string }[]) => {
+        if (!items || items.length === 0) return false;
+        if (items.length > 1) return true;
+        const only = items[0];
+        return !!only.hasImage || (only.description?.trim().length ?? 0) > 0;
+    };
 
     const addComponent = () => {
-        if (components.some((component) => !component.hasImage || component.description.trim() === "")) {
-            alert("Please upload an image and provide a description for the current component before adding a new one.");
+        if (components.some((component) => !component.hasImage)) {
+            alert("Please upload an image for the current component before adding a new one.");
             return;
         }
-        setComponents((prev) => [...prev, { id: uuidv4(), hasImage: false, description: "" }]);
-        setUnsavedChanges(true);
+        setComponents((prev) => {
+            const newComponents = [...prev, { id: uuidv4(), hasImage: false, description: "" }];
+            setTimeout(() => {
+                lastComponentRef.current?.scrollIntoView({ behavior: "smooth" });
+            }, 0);
+            if (!isResettingRef.current) setUnsavedChanges(isDirty(newComponents));
+            return newComponents;
+        });
     };
 
     const removeComponent = (id: string) => {
-        setComponents((prev) => prev.filter((component) => component.id !== id));
-        setUnsavedChanges(true);
+        setComponents((prev) => {
+            const newComponents = prev.filter((component) => component.id !== id);
+            if (!isResettingRef.current) setUnsavedChanges(isDirty(newComponents));
+            return newComponents;
+        });
     };
 
     const updateHasImage = (id: string, hasImage: boolean) => {
-        setComponents((prev) =>
-            prev.map((component) =>
+        setComponents((prev) => {
+            const newComponents = prev.map((component) =>
                 component.id === id ? { ...component, hasImage } : component
-            )
-        );
-        setUnsavedChanges(true);
+            );
+            if (!isResettingRef.current) setUnsavedChanges(isDirty(newComponents));
+            return newComponents;
+        });
     };
 
     const updateDescription = (id: string, description: string) => {
-        setComponents((prev) =>
-            prev.map((component) =>
+        setComponents((prev) => {
+            const newComponents = prev.map((component) =>
                 component.id === id ? { ...component, description } : component
-            )
-        );
-        setUnsavedChanges(true);
+            );
+            if (!isResettingRef.current) setUnsavedChanges(isDirty(newComponents));
+            return newComponents;
+        });
     };
 
     const discardChanges = () => {
         const confirmDiscard = window.confirm("Are you sure you want to discard all changes?");
         if (!confirmDiscard) return;
-        setComponents([{ id: uuidv4(), hasImage: false, description: "" }]);
+        isResettingRef.current = true;
+    // Reset children inputs and previews
+    setResetToken((n) => n + 1);
+    // Reset the list to a single fresh component
+    setComponents([{ id: uuidv4(), hasImage: false, description: "" }]);
         setUnsavedChanges(false);
+        // Allow child callbacks again on next tick
+        setTimeout(() => {
+            isResettingRef.current = false;
+        }, 0);
     };
 
     return (
-        <div className="flex flex-col items-center gap-5 w-full">
-            {components.map(({ id }) => (
-                <div key={id} className="w-full flex flex-col gap-3">
+        <div className="flex flex-col items-center gap-5 w-full ">
+            {components.map(({ id }, index) => (
+                <div
+                    key={id}
+                    ref={index === components.length - 1 ? lastComponentRef : null}
+                    className="w-full flex flex-col gap-3"
+                >
                     {components.length > 1 && (
                         <div className="flex justify-end">
                             <button
@@ -72,6 +105,7 @@ const Carousel: React.FC<CarouselProps> = ({ setUnsavedChanges }) => {
                         uniqueId={`component-${id}`}
                         onImageChange={(hasImage) => updateHasImage(id, hasImage)}
                         onDescriptionChange={(desc: string) => updateDescription(id, desc)}
+                        resetToken={resetToken}
                     />
                     <hr className="my-4 border-gray-300" />
                 </div>

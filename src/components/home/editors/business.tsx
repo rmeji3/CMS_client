@@ -15,25 +15,34 @@ const Business: React.FC<BusinessProps> = ({ setUnsavedChanges }) => {
     });
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [resetToken, setResetToken] = useState<number>(0);
 
     const toggleSection = (section: string) => {
         setExpandedSections((prev) => ({
             ...prev,
             [section]: !prev[section],
         }));
-        setUnsavedChanges(true);
+        // Do not mark unsaved just for expanding/collapsing
     };
+
+    const markDirty = () => setUnsavedChanges(true);
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0] || null;
         setSelectedImage(file);
-        setPreviewUrl(file ? URL.createObjectURL(file) : null);
+        setPreviewUrl((prev) => {
+            if (prev) URL.revokeObjectURL(prev);
+            return file ? URL.createObjectURL(file) : null;
+        });
         setUnsavedChanges(true);
     };
 
     const clearImage = () => {
         setSelectedImage(null);
-        setPreviewUrl(null);
+        setPreviewUrl((prev) => {
+            if (prev) URL.revokeObjectURL(prev);
+            return null;
+        });
         setUnsavedChanges(true);
         // Reset the file input value to allow re-uploading the same file
         const fileInput = document.getElementById('image-upload') as HTMLInputElement;
@@ -43,9 +52,16 @@ const Business: React.FC<BusinessProps> = ({ setUnsavedChanges }) => {
     };
 
     const discardChanges = () => {
+        const ok = window.confirm('Are you sure you want to discard all changes?');
+        if (!ok) return;
         setExpandedSections({ about: false, socials: false, address: false });
         setSelectedImage(null);
-        setPreviewUrl(null);
+        setPreviewUrl((prev) => {
+            if (prev) URL.revokeObjectURL(prev);
+            return null;
+        });
+    // Force remount of section components to clear any uncontrolled inputs
+    setResetToken((n) => n + 1);
         setUnsavedChanges(false);
     };
 
@@ -53,24 +69,30 @@ const Business: React.FC<BusinessProps> = ({ setUnsavedChanges }) => {
         <div className="flex flex-col items-start gap-3">
             {/* About section */}
             <AboutSection
+                key={`about-${resetToken}`}
                 expanded={!!expandedSections.about}
                 toggle={() => toggleSection('about')}
                 selectedImage={selectedImage}
                 previewUrl={previewUrl}
                 handleImageChange={handleImageChange}
                 clearImage={clearImage}
+                onDirty={markDirty}
             />
 
             {/* Socials section */}
             <SocialsSection
+                key={`socials-${resetToken}`}
                 expanded={!!expandedSections.socials}
                 toggle={() => toggleSection('socials')}
+                onDirty={markDirty}
             />
 
             {/* Address section */}
             <AddressSection
+                key={`address-${resetToken}`}
                 expanded={!!expandedSections.address}
                 toggle={() => toggleSection('address')}
+                onDirty={markDirty}
             />
             <div className="flex justify-end gap-3 w-full">
                 <button

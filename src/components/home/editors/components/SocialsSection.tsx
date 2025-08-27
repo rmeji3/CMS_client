@@ -4,9 +4,10 @@ import { FaChevronDown } from 'react-icons/fa';
 type Props = {
   expanded: boolean;
   toggle: () => void;
+  onDirty?: () => void;
 };
 
-const SocialsSection: React.FC<Props> = ({ expanded, toggle }) => {
+const SocialsSection: React.FC<Props> = ({ expanded, toggle, onDirty }) => {
   return (
     <div className="w-full border-b border-gray-300 pb-2">
       <div
@@ -30,18 +31,21 @@ const SocialsSection: React.FC<Props> = ({ expanded, toggle }) => {
             type="email"
             placeholder="Email"
             className="border border-gray-300 rounded-lg p-2 w-1/2"
+            onChange={onDirty}
           />
           <label className="font-semibold mt-2">Phone</label>
           <input
             type="tel"
             placeholder="Phone"
             className="border border-gray-300 rounded-lg p-2 w-1/2"
+            onChange={onDirty}
           />
           <label className="font-semibold mt-2">Facebook</label>
           <input
             type="text"
             placeholder="Facebook"
             className="border border-gray-300 rounded-lg p-2 w-1/2"
+            onChange={onDirty}
           />
         </div>
       </div>

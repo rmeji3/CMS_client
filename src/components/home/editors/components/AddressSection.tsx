@@ -4,9 +4,10 @@ import { FaChevronDown } from 'react-icons/fa';
 type Props = {
   expanded: boolean;
   toggle: () => void;
+  onDirty?: () => void;
 };
 
-const AddressSection: React.FC<Props> = ({ expanded, toggle }) => {
+const AddressSection: React.FC<Props> = ({ expanded, toggle, onDirty }) => {
   return (
     <div className="w-full border-b border-gray-300 pb-2">
       <div
@@ -30,6 +31,7 @@ const AddressSection: React.FC<Props> = ({ expanded, toggle }) => {
             type="text"
             placeholder="Street"
             className="border border-gray-300 rounded-lg p-2 w-full"
+            onChange={onDirty}
           />
           <div className="flex w-full mt-2">
             <div className="flex flex-col w-1/2">
@@ -38,6 +40,7 @@ const AddressSection: React.FC<Props> = ({ expanded, toggle }) => {
                 type="text"
                 placeholder="City"
                 className="border border-gray-300 rounded-lg p-2 w-full"
+                onChange={onDirty}
               />
             </div>
             <div className="flex w-1/2 px-2 gap-2">
@@ -47,6 +50,7 @@ const AddressSection: React.FC<Props> = ({ expanded, toggle }) => {
                   type="text"
                   placeholder="State"
                   className="border border-gray-300 rounded-lg p-2 w-full"
+                  onChange={onDirty}
                 />
               </div>
               <div className="flex flex-col w-1/2">
@@ -55,6 +59,7 @@ const AddressSection: React.FC<Props> = ({ expanded, toggle }) => {
                   type="text"
                   placeholder="Zip Code"
                   className="border border-gray-300 rounded-lg p-2 w-full"
+                  onChange={onDirty}
                 />
               </div>
             </div>

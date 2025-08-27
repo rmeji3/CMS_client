@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 type ImageWithDescriptionProps = {
     uniqueId: string;
     onImageChange: (hasImage: boolean) => void;
     onDescriptionChange: (description: string) => void;
+    /**
+     * When this token changes, the component clears its internal state.
+     */
+    resetToken?: number;
 };
 
-const ImageWithDescription: React.FC<ImageWithDescriptionProps> = ({ uniqueId, onImageChange, onDescriptionChange }) => {
+const ImageWithDescription: React.FC<ImageWithDescriptionProps> = ({ uniqueId, onImageChange, onDescriptionChange, resetToken }) => {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [description, setDescription] = useState<string>('');
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -14,7 +18,11 @@ const ImageWithDescription: React.FC<ImageWithDescriptionProps> = ({ uniqueId, o
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0] || null;
         setSelectedImage(file);
-        setPreviewUrl(file ? URL.createObjectURL(file) : null);
+        // Revoke previous URL if any to prevent leaks
+        setPreviewUrl((prev) => {
+            if (prev) URL.revokeObjectURL(prev);
+            return file ? URL.createObjectURL(file) : null;
+        });
         onImageChange(!!file);
     };
 
@@ -23,6 +31,28 @@ const ImageWithDescription: React.FC<ImageWithDescriptionProps> = ({ uniqueId, o
         setDescription(newDescription);
         onDescriptionChange(newDescription);
     };
+
+    // Cleanup object URL on unmount
+    useEffect(() => {
+        return () => {
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+        };
+        // We only care on unmount; do not add previewUrl as dep to avoid revoking new urls
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // External reset: clear internal state and notify parent
+    useEffect(() => {
+        if (resetToken === undefined) return;
+        setSelectedImage(null);
+        setPreviewUrl((prev) => {
+            if (prev) URL.revokeObjectURL(prev);
+            return null;
+        });
+        setDescription('');
+        onImageChange(false);
+        onDescriptionChange('');
+    }, [resetToken]);
 
     return (
         <div className="flex flex-col items-center gap-4 w-full">
