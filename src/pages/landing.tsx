@@ -34,7 +34,7 @@ const Landing: React.FC = () => {
             </button>
 
             {/* dashboard picture */}
-            <section className='bg-white rounded-md w-[900px] h-[600px] z-10'>
+            <section className='bg-white rounded-lg w-[900px] h-[600px] z-10'>
                 {/* Placeholder for dashboard picture */}
             </section>
 
@@ -43,7 +43,7 @@ const Landing: React.FC = () => {
             {features.map((feature, index) => (
                 <li key={index} className="relative group w-[300px]">
                     {/* Glow sits behind the card */}
-                    <div className="relative z-10 flex flex-col border border-gray-300 p-6 rounded-md drop-shadow-lg bg-white gap-2 transition-shadow duration-500">
+                    <div className="relative z-10 flex flex-col border border-gray-300 p-6 rounded-lg drop-shadow-lg bg-white gap-2 transition-shadow duration-500">
                         <div className='flex items-center gap-3'>
                             <span className="text-2xl">{featureIcons[index]}</span>
                             <h2 className="text-2xl font-semibold">{feature.title}</h2>

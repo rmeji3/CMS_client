@@ -1,7 +1,8 @@
 import React from "react";
 
 //import components
-import Analytics from "../components/analytics";
+import Analytics from "../components/home/analytics";
+import Editor from "../components/home/editor";
 
 const viewsData = [10, 20, 30, 11, 41, 100, 110];
 const Home: React.FC = () => {
@@ -15,6 +16,9 @@ const Home: React.FC = () => {
             {/* Analytics card */}
             <Analytics weeklyViews={viewsData}/>
             
+            {/* editor card */}
+            <Editor buttonLabels={['Business', 'Carousel', 'Menu']} />
+
         </main>
     );
 };

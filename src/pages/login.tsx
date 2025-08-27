@@ -36,7 +36,7 @@ const Login: React.FC = () => {
 
       <form
         onSubmit={handleLogin}
-        className="relative z-10 w-[420px] h-[400px] grid content-between border border-gray-300 p-6 rounded-md drop-shadow-lg bg-gray-100"
+        className="relative z-10 w-[420px] h-[400px] grid content-between border border-gray-300 p-6 rounded-lg drop-shadow-lg bg-gray-100"
       >
         <div>
           <h1 className="font-bold text-center text-[25px]">Login</h1>
@@ -51,7 +51,7 @@ const Login: React.FC = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Email"
-          className="p-2 border border-gray-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
           autoComplete="username"
         />
 
@@ -61,14 +61,14 @@ const Login: React.FC = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
-          className="p-2 border border-gray-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="p-2 border border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
           autoComplete="current-password"
         />
 
         <button
           type="submit"
           disabled={isLoading}
-          className="mt-3 px-6 py-2 flex justify-center items-center gap-2 font-bold rounded text-white bg-gradient-to-r from-purple-500 via-blue-500 to-blue-400 bg-[length:200%_200%] bg-left transition-all duration-700 hover:bg-right shadow-lg disabled:opacity-50 cursor-pointer"
+          className="mt-3 px-6 py-2 flex justify-center items-center gap-2 font-bold rounded-lg text-white bg-gradient-to-r from-purple-500 via-blue-500 to-blue-400 bg-[length:200%_200%] bg-left transition-all duration-700 hover:bg-right shadow-lg disabled:opacity-50 cursor-pointer"
         >
           <FaLock className="h-[20px] w-[20px]" />
           {isLoading ? "Signing In..." : "Sign In"}

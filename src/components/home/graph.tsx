@@ -47,7 +47,7 @@ export default function Graph({ weeklyViews }: GraphProps) {
           fill: '#707f90',
         },
         '& .MuiChartsGrid-line': {
-          stroke: '#e5e7eb', // optional lighter grid (gray-200)
+          stroke: '#e5e7eb',
         },
       }}
       >
