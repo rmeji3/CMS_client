@@ -56,7 +56,7 @@ const Carousel: React.FC<CarouselProps> = ({ setUnsavedChanges }) => {
 
     return (
         <div className="flex flex-col items-center gap-5 w-full">
-            {components.map(({ id, description }) => (
+            {components.map(({ id }) => (
                 <div key={id} className="w-full flex flex-col gap-3">
                     {components.length > 1 && (
                         <div className="flex justify-end">
