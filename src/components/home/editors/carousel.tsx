@@ -85,6 +85,9 @@ const Carousel: React.FC<CarouselProps> = ({ setUnsavedChanges }) => {
 
     return (
         <div className="flex flex-col items-center gap-5 w-full ">
+            <div className="w-full flex justify-start">
+                <h1 className="text-2xl font-semibold">Carousel Items</h1>
+            </div>
             {components.map(({ id }, index) => (
                 <div
                     key={id}

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 
-import Business from './editors/business';
+import Info from './editors/info';
 import Carousel from './editors/carousel';
+import Menu from './editors/menu';
 
 type EditorProps = {
     buttonLabels?: string[];
@@ -94,10 +95,14 @@ const Editor: React.FC<EditorProps> = ({ buttonLabels = [] }) => {
             </div>
             <div className='flex gap-2 items-center mb-5'>
                 <div className="bg-gray-100 w-[1000px] rounded-lg shadow-md border border-gray-300 p-5">
-                    {selectedButton === 'Carousel' ? (
+                    {selectedButton === 'Carousel' && (
                         <Carousel setUnsavedChanges={setUnsavedChanges} />
-                    ) : (
-                        <Business setUnsavedChanges={setUnsavedChanges} />
+                    )}
+                    {selectedButton === 'Info' && (
+                        <Info setUnsavedChanges={setUnsavedChanges} />
+                    )}
+                    {selectedButton === 'Menu' && (
+                        <Menu setUnsavedChanges={setUnsavedChanges} />
                     )}
                 </div>
             </div>
