@@ -62,7 +62,7 @@ const ImageWithDescription: React.FC<ImageWithDescriptionProps> = ({ uniqueId, o
                         value={description}
                         onChange={handleDescriptionChange}
                         placeholder="Enter a description..."
-                        className="border border-gray-300 rounded-lg h-full w-full"
+                        className="border border-gray-300 rounded-lg h-full w-full resize-none"
                         rows={4}
                     />
                     <div className="flex items-center justify-between w-full">
@@ -91,7 +91,7 @@ const ImageWithDescription: React.FC<ImageWithDescriptionProps> = ({ uniqueId, o
                 <div className="relative w-1/2">
                     {previewUrl ? (
                         <div className="w-full flex flex-col items-center">
-                            <img src={previewUrl} alt="Selected" className=" h-auto max-h-64 rounded-lg border border-gray-300 shadow-md object-contain" />
+                            <img src={previewUrl} alt="Selected" className="h-auto max-h-64 rounded-lg border border-gray-300 shadow-md object-contain" />
                         </div>
                     ) : (
                         <div className="w-full h-64 flex w-full items-center justify-center border border-dashed border-gray-300 rounded-lg bg-gray-100">

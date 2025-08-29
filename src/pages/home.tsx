@@ -17,7 +17,7 @@ const Home: React.FC = () => {
             <Analytics weeklyViews={viewsData}/>
             
             {/* editor card */}
-            <Editor buttonLabels={['Business', 'Carousel', 'Menu']} />
+            <Editor buttonLabels={['Info', 'Carousel', 'Menu']} />
 
         </main>
     );
