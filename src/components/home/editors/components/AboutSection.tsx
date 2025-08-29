@@ -26,7 +26,7 @@ const AboutSection: React.FC<Props> = ({ expanded, toggle, selectedImage, previe
       <label className="font-semibold mt-2">Description</label>
       <textarea
         placeholder="Description"
-        className="border border-gray-300 rounded-lg p-2 w-full h-24"
+        className="border border-gray-300 rounded-lg p-2 w-full h-24 resize-none"
         onChange={onDirty}
       />
 
