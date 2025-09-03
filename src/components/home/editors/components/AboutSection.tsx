@@ -11,9 +11,30 @@ type Props = {
   clearImage: () => void;
   onDirty?: () => void;
   embedded?: boolean;
+  // controlled fields
+  title: string;
+  description: string;
+  onTitleChange: (value: string) => void;
+  onDescriptionChange: (value: string) => void;
+  currentImageUrl?: string | null;
 };
 
-const AboutSection: React.FC<Props> = ({ expanded, toggle, selectedImage, previewUrl, handleImageChange, clearImage, onDirty, embedded }) => {
+const AboutSection: React.FC<Props> = ({
+  expanded,
+  toggle,
+  selectedImage,
+  previewUrl,
+  handleImageChange,
+  clearImage,
+  onDirty,
+  embedded,
+  title,
+  description,
+  onTitleChange,
+  onDescriptionChange,
+  currentImageUrl,
+}) => {
+  const displayImageUrl = previewUrl || currentImageUrl || null;
   const body = (
     <div className="flex flex-col w-full">
       <label className="font-semibold">Title</label>
@@ -21,28 +42,38 @@ const AboutSection: React.FC<Props> = ({ expanded, toggle, selectedImage, previe
         type="text"
         placeholder="Title"
         className="border border-gray-300 rounded-lg p-2 w-1/2"
-        onChange={onDirty}
+        value={title}
+        onChange={(e) => {
+          onTitleChange(e.target.value);
+          onDirty?.();
+        }}
       />
       <label className="font-semibold mt-2">Description</label>
       <textarea
         placeholder="Description"
         className="border border-gray-300 rounded-lg p-2 w-full h-24 resize-none"
-        onChange={onDirty}
+        value={description}
+        onChange={(e) => {
+          onDescriptionChange(e.target.value);
+          onDirty?.();
+        }}
       />
 
-      {previewUrl && (
+      {displayImageUrl && (
         <div className="relative mt-4 w-1/2">
           <img
-            src={previewUrl}
+            src={displayImageUrl}
             alt="Preview"
             className="w-full h-auto max-h-64 rounded-lg border border-gray-300 shadow-md object-contain"
           />
-          <button
-            onClick={clearImage}
-            className="absolute top-2 right-2 bg-gray-100 border border-gray-300 shadow-md rounded-full p-1 cursor-pointer"
-          >
-            <RxCross2 className="text-red-500 w-5 h-5" />
-          </button>
+          {previewUrl && (
+            <button
+              onClick={clearImage}
+              className="absolute top-2 right-2 bg-gray-100 border border-gray-300 shadow-md rounded-full p-1 cursor-pointer"
+            >
+              <RxCross2 className="text-red-500 w-5 h-5" />
+            </button>
+          )}
         </div>
       )}
 
