@@ -1,8 +1,9 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 import AboutSection from './components/AboutSection';
 import SocialsSection from './components/SocialsSection';
 import AddressSection from './components/AddressSection';
+import { useFetchAboutQuery, usePatchAboutMutation, useUploadAboutImageMutation } from '../../../services/about';
 
 type InfoProps = {
     setUnsavedChanges: (unsaved: boolean) => void;
@@ -17,6 +18,18 @@ const Info: React.FC<InfoProps> = ({ setUnsavedChanges }) => {
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [resetToken, setResetToken] = useState<number>(0);
+    const [title, setTitle] = useState<string>('');
+    const [description, setDescription] = useState<string>('');
+    const { data: about, isFetching: isLoadingAbout, refetch } = useFetchAboutQuery();
+    const resolvedImageUrl = React.useMemo(() => {
+        const url = about?.imageUrl?.trim();
+        if (!url) return null;
+        if (/^https?:\/\//i.test(url)) return url;
+        const HOST = 'https://localhost:7108';
+        return `${HOST}${url.startsWith('/') ? '' : '/'}${url}`;
+    }, [about?.imageUrl]);
+    const [patchAbout, { isLoading: isPatching }] = usePatchAboutMutation();
+    const [uploadImage, { isLoading: isUploading }] = useUploadAboutImageMutation();
     const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({
         about: null,
         socials: null,
@@ -74,6 +87,35 @@ const Info: React.FC<InfoProps> = ({ setUnsavedChanges }) => {
         });
         setResetToken((n) => n + 1);
         setUnsavedChanges(false);
+        // reload server state
+        refetch();
+    };
+
+    // Populate from server
+    useEffect(() => {
+        if (about) {
+            setTitle(about.title ?? '');
+            setDescription(about.description ?? '');
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [about, resetToken]);
+
+    const applyChanges = async () => {
+        try {
+            // First upload image if selected
+            if (selectedImage) {
+                await uploadImage(selectedImage).unwrap();
+            }
+            // Then patch text fields
+            await patchAbout({ title, description }).unwrap();
+            setUnsavedChanges(false);
+            // Optionally refresh
+            await refetch();
+            alert('About updated');
+        } catch (err) {
+            console.error(err);
+            alert('Failed to update About');
+        }
     };
 
     return (
@@ -108,6 +150,11 @@ const Info: React.FC<InfoProps> = ({ setUnsavedChanges }) => {
                             clearImage={clearImage}
                             onDirty={markDirty}
                             embedded
+                            title={title}
+                            description={description}
+                            onTitleChange={setTitle}
+                            onDescriptionChange={setDescription}
+                            currentImageUrl={resolvedImageUrl}
                         />
                     </div>
                 </div>
@@ -183,10 +230,12 @@ const Info: React.FC<InfoProps> = ({ setUnsavedChanges }) => {
                     Discard
                 </button>
                 <button
-                    type="submit"
+                    type="button"
+                    onClick={applyChanges}
                     className="mt-3 px-6 py-2 w-[170px] h-[40px] flex justify-center items-center gap-2 font-bold rounded-lg text-white bg-gradient-to-r from-purple-500 via-blue-500 to-blue-400 bg-[length:200%_200%] bg-left transition-all duration-700 hover:bg-right shadow-lg disabled:opacity-50 cursor-pointer"
+                    disabled={isLoadingAbout || isPatching || isUploading}
                 >
-                    Apply Changes
+                    {(isPatching || isUploading) ? 'Applying…' : 'Apply Changes'}
                 </button>
             </div>
         </div>
