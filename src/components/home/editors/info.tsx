@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
-import AboutSection from './components/AboutSection';
-import SocialsSection from './components/SocialsSection';
-import { useFetchSocialsQuery, usePatchSocialsMutation } from '../../../services/socials';
-import AddressSection from './components/AddressSection';
-import { useFetchAboutQuery, usePatchAboutMutation, useUploadAboutImageMutation } from '../../../services/about';
+import AboutSection from './components/info/AboutSection';
+import SocialsSection from './components/info/SocialsSection';
+import { useFetchSocialsQuery, usePatchSocialsMutation } from '../../../services/info/socials';
+import AddressSection from './components/info/AddressSection';
+import { useFetchAddressQuery, usePatchAddressMutation } from '../../../services/info/address';
+import { useFetchAboutQuery, usePatchAboutMutation, useUploadAboutImageMutation } from '../../../services/info/about';
 
 type InfoProps = {
     setUnsavedChanges: (unsaved: boolean) => void;
@@ -25,6 +26,15 @@ const Info: React.FC<InfoProps> = ({ setUnsavedChanges }) => {
         phone: '',
         facebook: '',
     });
+    // Address state
+    const [address, setAddress] = useState({
+        street: '',
+        city: '',
+        state: '',
+        zipcode: '',
+    });
+    const { data: addressData, isFetching: isLoadingAddress, refetch: refetchAddress } = useFetchAddressQuery();
+    const [patchAddress, { isLoading: isPatchingAddress }] = usePatchAddressMutation();
     const { data: socialsData, isFetching: isLoadingSocials, refetch: refetchSocials } = useFetchSocialsQuery();
     const [patchSocials, { isLoading: isPatchingSocials }] = usePatchSocialsMutation();
     const [title, setTitle] = useState<string>('');
@@ -99,6 +109,7 @@ const Info: React.FC<InfoProps> = ({ setUnsavedChanges }) => {
         // reload server state
         refetch();
         refetchSocials();
+        refetchAddress();
     };
 
 
@@ -120,6 +131,17 @@ const Info: React.FC<InfoProps> = ({ setUnsavedChanges }) => {
         }
     }, [socialsData, resetToken]);
 
+    useEffect(() => {
+        if (addressData) {
+            setAddress({
+                street: addressData.street ?? '',
+                city: addressData.city ?? '',
+                state: addressData.state ?? '',
+                zipcode: addressData.zipcode ?? '',
+            });
+        }
+    }, [addressData, resetToken]);
+
     const applyChanges = async () => {
         try {
             // First upload image if selected
@@ -130,10 +152,13 @@ const Info: React.FC<InfoProps> = ({ setUnsavedChanges }) => {
             await patchAbout({ title, description }).unwrap();
             // Patch socials
             await patchSocials(socials).unwrap();
+            // Patch address
+            await patchAddress(address).unwrap();
             setUnsavedChanges(false);
             // Optionally refresh
             await refetch();
             await refetchSocials();
+            await refetchAddress();
             alert('Changes updated');
         } catch (err) {
             console.error(err);
@@ -244,6 +269,11 @@ const Info: React.FC<InfoProps> = ({ setUnsavedChanges }) => {
                             toggle={() => toggleSection('address')}
                             onDirty={markDirty}
                             embedded
+                            street={address.street}
+                            city={address.city}
+                            state={address.state}
+                            zipcode={address.zipcode}
+                            onFieldChange={(field, value) => setAddress(a => ({ ...a, [field]: value }))}
                         />
                     </div>
                 </div>
@@ -260,9 +290,9 @@ const Info: React.FC<InfoProps> = ({ setUnsavedChanges }) => {
                     type="button"
                     onClick={applyChanges}
                     className="mt-3 px-6 py-2 w-[170px] h-[40px] flex justify-center items-center gap-2 font-bold rounded-lg text-white bg-gradient-to-r from-purple-500 via-blue-500 to-blue-400 bg-[length:200%_200%] bg-left transition-all duration-700 hover:bg-right shadow-lg disabled:opacity-50 cursor-pointer"
-                    disabled={isLoadingAbout || isPatching || isUploading || isLoadingSocials || isPatchingSocials}
+                    disabled={isLoadingAbout || isPatching || isUploading || isLoadingSocials || isPatchingSocials || isLoadingAddress || isPatchingAddress}
                 >
-                    {(isPatching || isUploading || isPatchingSocials) ? 'Applying…' : 'Apply Changes'}
+                    {(isPatching || isUploading || isPatchingSocials || isPatchingAddress) ? 'Applying…' : 'Apply Changes'}
                 </button>
             </div>
         </div>

@@ -6,9 +6,14 @@ type Props = {
   toggle: () => void;
   onDirty?: () => void;
   embedded?: boolean;
+  street: string;
+  city: string;
+  state: string;
+  zipcode: string;
+  onFieldChange: (field: string, value: string) => void;
 };
 
-const AddressSection: React.FC<Props> = ({ expanded, toggle, onDirty, embedded }) => {
+const AddressSection: React.FC<Props> = ({ expanded, toggle, onDirty, embedded, street, city, state, zipcode, onFieldChange }) => {
   const body = (
     <div className="flex flex-col w-full">
       <label className="font-semibold">Street</label>
@@ -16,7 +21,8 @@ const AddressSection: React.FC<Props> = ({ expanded, toggle, onDirty, embedded }
         type="text"
         placeholder="Street"
         className="border border-gray-300 rounded-lg p-2 w-full"
-        onChange={onDirty}
+        value={street}
+        onChange={e => { onFieldChange('street', e.target.value); onDirty?.(); }}
       />
       <div className="flex w-full mt-2">
         <div className="flex flex-col w-1/2">
@@ -25,7 +31,8 @@ const AddressSection: React.FC<Props> = ({ expanded, toggle, onDirty, embedded }
             type="text"
             placeholder="City"
             className="border border-gray-300 rounded-lg p-2 w-full"
-            onChange={onDirty}
+            value={city}
+            onChange={e => { onFieldChange('city', e.target.value); onDirty?.(); }}
           />
         </div>
         <div className="flex w-1/2 px-2 gap-2">
@@ -35,7 +42,8 @@ const AddressSection: React.FC<Props> = ({ expanded, toggle, onDirty, embedded }
               type="text"
               placeholder="State"
               className="border border-gray-300 rounded-lg p-2 w-full"
-              onChange={onDirty}
+              value={state}
+              onChange={e => { onFieldChange('state', e.target.value); onDirty?.(); }}
             />
           </div>
           <div className="flex flex-col w-1/2">
@@ -44,7 +52,8 @@ const AddressSection: React.FC<Props> = ({ expanded, toggle, onDirty, embedded }
               type="text"
               placeholder="Zip Code"
               className="border border-gray-300 rounded-lg p-2 w-full"
-              onChange={onDirty}
+              value={zipcode}
+              onChange={e => { onFieldChange('zipcode', e.target.value); onDirty?.(); }}
             />
           </div>
         </div>

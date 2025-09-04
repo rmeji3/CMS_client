@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { attachAntiForgeryHeaders } from './csrf';
-import type { Socials } from './types';
+import { attachAntiForgeryHeaders } from '../csrf';
+import type { Socials } from '../types';
 
 export const socialsApi = createApi({
   reducerPath: 'socialsApi',

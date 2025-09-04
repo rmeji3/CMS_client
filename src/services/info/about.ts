@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { attachAntiForgeryHeaders } from './csrf';
-import type { About } from './types';
+import { attachAntiForgeryHeaders } from '../csrf';
+import type { About } from '../types';
 
 export const aboutApi = createApi({
   reducerPath: 'aboutApi',
