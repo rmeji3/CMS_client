@@ -4,8 +4,9 @@ import { setupListeners } from '@reduxjs/toolkit/query'
 import { profileApi } from './services/profile';
 import { authApi } from './services/auth';
 import { antiforgeryApi } from './services/antiforgery';
-import { aboutApi } from './services/about';
-import { socialsApi } from './services/socials';
+import { aboutApi } from './services/info/about';
+import { socialsApi } from './services/info/socials';
+import { addressApi } from './services/info/address';
 
 export const store = configureStore({
   reducer: {
@@ -15,6 +16,7 @@ export const store = configureStore({
     [antiforgeryApi.reducerPath]: antiforgeryApi.reducer,
   [aboutApi.reducerPath]: aboutApi.reducer,
   [socialsApi.reducerPath]: socialsApi.reducer,
+  [addressApi.reducerPath]: addressApi.reducer,
   },
   // Adding the api middleware enables caching, invalidation, polling,
   // and other useful features of `rtk-query`.
@@ -24,7 +26,8 @@ export const store = configureStore({
       authApi.middleware,
       antiforgeryApi.middleware,
       aboutApi.middleware,
-      socialsApi.middleware
+      socialsApi.middleware,
+      addressApi.middleware
     ),
 })
 
