@@ -5,6 +5,7 @@ import { profileApi } from './services/profile';
 import { authApi } from './services/auth';
 import { antiforgeryApi } from './services/antiforgery';
 import { aboutApi } from './services/about';
+import { socialsApi } from './services/socials';
 
 export const store = configureStore({
   reducer: {
@@ -12,12 +13,19 @@ export const store = configureStore({
     [profileApi.reducerPath]: profileApi.reducer,
     [authApi.reducerPath]: authApi.reducer,
     [antiforgeryApi.reducerPath]: antiforgeryApi.reducer,
-    [aboutApi.reducerPath]: aboutApi.reducer, 
+  [aboutApi.reducerPath]: aboutApi.reducer,
+  [socialsApi.reducerPath]: socialsApi.reducer,
   },
   // Adding the api middleware enables caching, invalidation, polling,
   // and other useful features of `rtk-query`.
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(profileApi.middleware, authApi.middleware, antiforgeryApi.middleware, aboutApi.middleware),
+    getDefaultMiddleware().concat(
+      profileApi.middleware,
+      authApi.middleware,
+      antiforgeryApi.middleware,
+      aboutApi.middleware,
+      socialsApi.middleware
+    ),
 })
 
 // optional, but required for refetchOnFocus/refetchOnReconnect behaviors

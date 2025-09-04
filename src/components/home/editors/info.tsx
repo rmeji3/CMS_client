@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 import AboutSection from './components/AboutSection';
 import SocialsSection from './components/SocialsSection';
+import { useFetchSocialsQuery, usePatchSocialsMutation } from '../../../services/socials';
 import AddressSection from './components/AddressSection';
 import { useFetchAboutQuery, usePatchAboutMutation, useUploadAboutImageMutation } from '../../../services/about';
 
@@ -18,6 +19,14 @@ const Info: React.FC<InfoProps> = ({ setUnsavedChanges }) => {
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [resetToken, setResetToken] = useState<number>(0);
+    // Socials state
+    const [socials, setSocials] = useState({
+        email: '',
+        phone: '',
+        facebook: '',
+    });
+    const { data: socialsData, isFetching: isLoadingSocials, refetch: refetchSocials } = useFetchSocialsQuery();
+    const [patchSocials, { isLoading: isPatchingSocials }] = usePatchSocialsMutation();
     const [title, setTitle] = useState<string>('');
     const [description, setDescription] = useState<string>('');
     const { data: about, isFetching: isLoadingAbout, refetch } = useFetchAboutQuery();
@@ -89,7 +98,9 @@ const Info: React.FC<InfoProps> = ({ setUnsavedChanges }) => {
         setUnsavedChanges(false);
         // reload server state
         refetch();
+        refetchSocials();
     };
+
 
     // Populate from server
     useEffect(() => {
@@ -97,8 +108,17 @@ const Info: React.FC<InfoProps> = ({ setUnsavedChanges }) => {
             setTitle(about.title ?? '');
             setDescription(about.description ?? '');
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [about, resetToken]);
+
+    useEffect(() => {
+        if (socialsData) {
+            setSocials({
+                email: socialsData.email ?? '',
+                phone: socialsData.phone ?? '',
+                facebook: socialsData.facebook ?? '',
+            });
+        }
+    }, [socialsData, resetToken]);
 
     const applyChanges = async () => {
         try {
@@ -106,15 +126,18 @@ const Info: React.FC<InfoProps> = ({ setUnsavedChanges }) => {
             if (selectedImage) {
                 await uploadImage(selectedImage).unwrap();
             }
-            // Then patch text fields
+            // Patch about text fields
             await patchAbout({ title, description }).unwrap();
+            // Patch socials
+            await patchSocials(socials).unwrap();
             setUnsavedChanges(false);
             // Optionally refresh
             await refetch();
-            alert('About updated');
+            await refetchSocials();
+            alert('Changes updated');
         } catch (err) {
             console.error(err);
-            alert('Failed to update About');
+            alert('Failed to update');
         }
     };
 
@@ -186,6 +209,10 @@ const Info: React.FC<InfoProps> = ({ setUnsavedChanges }) => {
                             toggle={() => toggleSection('socials')}
                             onDirty={markDirty}
                             embedded
+                            email={socials.email}
+                            phone={socials.phone}
+                            facebook={socials.facebook}
+                            onFieldChange={(field, value) => setSocials(s => ({ ...s, [field]: value }))}
                         />
                     </div>
                 </div>
@@ -233,9 +260,9 @@ const Info: React.FC<InfoProps> = ({ setUnsavedChanges }) => {
                     type="button"
                     onClick={applyChanges}
                     className="mt-3 px-6 py-2 w-[170px] h-[40px] flex justify-center items-center gap-2 font-bold rounded-lg text-white bg-gradient-to-r from-purple-500 via-blue-500 to-blue-400 bg-[length:200%_200%] bg-left transition-all duration-700 hover:bg-right shadow-lg disabled:opacity-50 cursor-pointer"
-                    disabled={isLoadingAbout || isPatching || isUploading}
+                    disabled={isLoadingAbout || isPatching || isUploading || isLoadingSocials || isPatchingSocials}
                 >
-                    {(isPatching || isUploading) ? 'Applying…' : 'Apply Changes'}
+                    {(isPatching || isUploading || isPatchingSocials) ? 'Applying…' : 'Apply Changes'}
                 </button>
             </div>
         </div>
