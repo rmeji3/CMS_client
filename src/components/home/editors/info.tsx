@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
-import AboutSection from './components/info/AboutSection';
 import SocialsSection from './components/info/SocialsSection';
-import { useFetchSocialsQuery, usePatchSocialsMutation } from '../../../services/info/socials';
 import AddressSection from './components/info/AddressSection';
+import AboutSection from './components/info/AboutSection';
 import { useFetchAddressQuery, usePatchAddressMutation } from '../../../services/info/address';
 import { useFetchAboutQuery, usePatchAboutMutation, useUploadAboutImageMutation } from '../../../services/info/about';
+import { useFetchSocialsQuery, usePatchSocialsMutation } from '../../../services/info/socials';
 
 type InfoProps = {
     setUnsavedChanges: (unsaved: boolean) => void;
