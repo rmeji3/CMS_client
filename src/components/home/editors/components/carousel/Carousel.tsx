@@ -1,41 +1,59 @@
 import React, { useEffect, useState } from 'react';
 
-type ImageWithDescriptionProps = {
+type CarouselProps = {
     uniqueId: string;
-    onImageChange: (hasImage: boolean) => void;
+    onImageChange: (hasImage: boolean, file?: File | null) => void;
     onDescriptionChange: (description: string) => void;
     /**
      * When this token changes, the component clears its internal state.
      */
     resetToken?: number;
+    /**
+     * Optional initial values used when rendering existing items.
+     */
+    initialImageUrl?: string | null;
+    initialDescription?: string | null;
 };
 
-const ImageWithDescription: React.FC<ImageWithDescriptionProps> = ({ uniqueId, onImageChange, onDescriptionChange, resetToken }) => {
+const Carousel: React.FC<CarouselProps> = ({ uniqueId, onImageChange, onDescriptionChange, resetToken, initialImageUrl, initialDescription }) => {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [description, setDescription] = useState<string>('');
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0] || null;
-        setSelectedImage(file);
-        // Revoke previous URL if any to prevent leaks
-        setPreviewUrl((prev) => {
-            if (prev) URL.revokeObjectURL(prev);
+    setSelectedImage(file);
+    // Revoke previous blob URL if any to prevent leaks
+    setPreviewUrl((prev) => {
+            if (prev && prev.startsWith('blob:')) URL.revokeObjectURL(prev);
             return file ? URL.createObjectURL(file) : null;
         });
-        onImageChange(!!file);
+        // Defer parent update to avoid setState during another component's render
+        setTimeout(() => onImageChange(!!file, file), 0);
     };
 
     const handleDescriptionChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         const newDescription = event.target.value;
         setDescription(newDescription);
-        onDescriptionChange(newDescription);
+        // Defer parent update to avoid setState during another component's render
+        setTimeout(() => onDescriptionChange(newDescription), 0);
     };
+
+    // Initialize from provided initial values (whenever they change)
+    useEffect(() => {
+        const initDesc = initialDescription ?? '';
+        setDescription(initDesc);
+        if (initialImageUrl) {
+            setPreviewUrl(initialImageUrl);
+        } else {
+            setPreviewUrl(null);
+        }
+    }, [uniqueId, initialDescription, initialImageUrl]);
 
     // Cleanup object URL on unmount
     useEffect(() => {
         return () => {
-            if (previewUrl) URL.revokeObjectURL(previewUrl);
+            if (previewUrl && previewUrl.startsWith('blob:')) URL.revokeObjectURL(previewUrl);
         };
         // We only care on unmount; do not add previewUrl as dep to avoid revoking new urls
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -43,15 +61,16 @@ const ImageWithDescription: React.FC<ImageWithDescriptionProps> = ({ uniqueId, o
 
     // External reset: clear internal state and notify parent
     useEffect(() => {
-        if (resetToken === undefined) return;
+        if (resetToken === undefined || resetToken === 0) return;
         setSelectedImage(null);
         setPreviewUrl((prev) => {
-            if (prev) URL.revokeObjectURL(prev);
+            if (prev && prev.startsWith('blob:')) URL.revokeObjectURL(prev);
             return null;
         });
         setDescription('');
-        onImageChange(false);
-        onDescriptionChange('');
+        // Defer parent updates to next tick
+        setTimeout(() => onImageChange(false, null), 0);
+        setTimeout(() => onDescriptionChange(''), 0);
     }, [resetToken]);
 
     return (
@@ -104,4 +123,4 @@ const ImageWithDescription: React.FC<ImageWithDescriptionProps> = ({ uniqueId, o
     );
 };
 
-export default ImageWithDescription;
+export default Carousel;

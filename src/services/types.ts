@@ -32,3 +32,16 @@ export interface Address {
   state?: string | null;
   zipcode?: string | null;
 }
+
+export interface CarouselItem {
+  id: number;
+  imageUrl: string;
+  description?: string;
+  carouselEntityId: number;
+}
+
+export interface CarouselEntity {
+  id: number;
+  tenantId: string;
+  items: CarouselItem[];
+}
