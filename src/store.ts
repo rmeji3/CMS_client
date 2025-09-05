@@ -7,6 +7,7 @@ import { antiforgeryApi } from './services/antiforgery';
 import { aboutApi } from './services/info/about';
 import { socialsApi } from './services/info/socials';
 import { addressApi } from './services/info/address';
+import { carouselApi } from './services/carousel/carousel';
 
 export const store = configureStore({
   reducer: {
@@ -14,9 +15,10 @@ export const store = configureStore({
     [profileApi.reducerPath]: profileApi.reducer,
     [authApi.reducerPath]: authApi.reducer,
     [antiforgeryApi.reducerPath]: antiforgeryApi.reducer,
-  [aboutApi.reducerPath]: aboutApi.reducer,
-  [socialsApi.reducerPath]: socialsApi.reducer,
-  [addressApi.reducerPath]: addressApi.reducer,
+    [aboutApi.reducerPath]: aboutApi.reducer,
+    [socialsApi.reducerPath]: socialsApi.reducer,
+    [addressApi.reducerPath]: addressApi.reducer,
+    [carouselApi.reducerPath]: carouselApi.reducer,
   },
   // Adding the api middleware enables caching, invalidation, polling,
   // and other useful features of `rtk-query`.
@@ -27,7 +29,8 @@ export const store = configureStore({
       antiforgeryApi.middleware,
       aboutApi.middleware,
       socialsApi.middleware,
-      addressApi.middleware
+      addressApi.middleware,
+      carouselApi.middleware
     ),
 })
 
