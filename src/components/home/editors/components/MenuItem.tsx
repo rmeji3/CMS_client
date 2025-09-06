@@ -4,27 +4,44 @@ type MenuItemProps = {
   uniqueId: string;
   resetToken?: number;
   onImageChange?: (hasImage: boolean) => void;
+  onImageFileChange?: (file: File | null) => void;
   onNameChange?: (name: string) => void;
   onPriceChange?: (price: string) => void;
   onDescriptionChange?: (desc: string) => void;
+  // Initial values for existing items
+  initialName?: string;
+  initialPrice?: string;
+  initialDescription?: string;
+  initialImageUrl?: string;
 };
 
 const MenuItem: React.FC<MenuItemProps> = ({
   uniqueId,
   resetToken,
   onImageChange,
+  onImageFileChange,
   onNameChange,
   onPriceChange,
   onDescriptionChange,
+  initialName = "",
+  initialPrice = "",
+  initialDescription = "",
+  initialImageUrl,
 }) => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(initialImageUrl || null);
 
-  const [name, setName] = useState<string>("");
-  const [price, setPrice] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
+  const [name, setName] = useState<string>(initialName);
+  const [price, setPrice] = useState<string>(initialPrice);
+  const [description, setDescription] = useState<string>(initialDescription);
 
   const objectUrlRef = useRef<string | null>(null);
+  const initializedIdRef = useRef<string | null>(null);
+  // Track per-field user edits to stop syncing from props once user changes a field
+  const nameDirtyRef = useRef<boolean>(false);
+  const priceDirtyRef = useRef<boolean>(false);
+  const descDirtyRef = useRef<boolean>(false);
+  const imageDirtyRef = useRef<boolean>(false);
 
   const revokeUrl = () => {
     if (objectUrlRef.current) {
@@ -37,6 +54,47 @@ const MenuItem: React.FC<MenuItemProps> = ({
     return () => revokeUrl();
   }, []);
 
+  // Sync from props until the user edits (per-field dirty flags). Always reset on uniqueId change.
+  useEffect(() => {
+    const isNewItem = initializedIdRef.current !== uniqueId;
+    if (isNewItem) {
+      // New item: initialize all fields from props and clear dirty flags
+      setName(initialName || "");
+      nameDirtyRef.current = false;
+      setPrice(initialPrice || "");
+      priceDirtyRef.current = false;
+      setDescription(initialDescription || "");
+      descDirtyRef.current = false;
+      revokeUrl();
+      setSelectedImage(null);
+      setPreviewUrl(initialImageUrl || null);
+      imageDirtyRef.current = false;
+      initializedIdRef.current = uniqueId;
+      return;
+    }
+
+    // Existing item: update any field that hasn't been edited yet
+    if (!nameDirtyRef.current) {
+      const next = initialName || "";
+      if (name !== next) setName(next);
+    }
+    if (!priceDirtyRef.current) {
+      const next = initialPrice || "";
+      if (price !== next) setPrice(next);
+    }
+    if (!descDirtyRef.current) {
+      const next = initialDescription || "";
+      if (description !== next) setDescription(next);
+    }
+    if (!imageDirtyRef.current && !selectedImage) {
+      const next = initialImageUrl || null;
+      if (previewUrl !== next) {
+        revokeUrl();
+        setPreviewUrl(next);
+      }
+    }
+  }, [uniqueId, initialName, initialPrice, initialDescription, initialImageUrl, name, price, description, previewUrl, selectedImage]);
+
   useEffect(() => {
     if (resetToken === undefined) return;
     setSelectedImage(null);
@@ -45,10 +103,12 @@ const MenuItem: React.FC<MenuItemProps> = ({
     setDescription("");
     revokeUrl();
     setPreviewUrl(null);
-    onImageChange?.(false);
-    onNameChange?.("");
-    onPriceChange?.("");
-    onDescriptionChange?.("");
+  // Force next effect run to treat as new and clear dirty flags
+  initializedIdRef.current = null;
+  nameDirtyRef.current = false;
+  priceDirtyRef.current = false;
+  descDirtyRef.current = false;
+  imageDirtyRef.current = false;
   }, [resetToken]);
 
   const handleImageChange = (file: File | null) => {
@@ -59,9 +119,11 @@ const MenuItem: React.FC<MenuItemProps> = ({
       objectUrlRef.current = url;
       setPreviewUrl(url);
       onImageChange?.(true);
+      onImageFileChange?.(file);
     } else {
       setPreviewUrl(null);
       onImageChange?.(false);
+      onImageFileChange?.(file);
     }
   };
 
@@ -74,6 +136,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
                 onChange={(e) => {
                     const v = e.target.value;
                     setName(v);
+          nameDirtyRef.current = true;
                     onNameChange?.(v);
                 }}
                 placeholder="Item name"
@@ -85,6 +148,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
                 onChange={(e) => {
                     const v = e.target.value;
                     setPrice(v);
+          priceDirtyRef.current = true;
                     onPriceChange?.(v);
                 }}
                 placeholder="Price (e.g., 9.99)"
@@ -95,6 +159,7 @@ const MenuItem: React.FC<MenuItemProps> = ({
                 onChange={(e) => {
                 const v = e.target.value;
                 setDescription(v);
+        descDirtyRef.current = true;
                 onDescriptionChange?.(v);
             }}
                 placeholder="Item description"

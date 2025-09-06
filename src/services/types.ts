@@ -22,9 +22,6 @@ export interface Socials {
   email?: string | null;
   phone?: string | null;
   facebook?: string | null;
-  instagram?: string | null;
-  tiktok?: string | null;
-  twitter?: string | null;
 }
 export interface Address {
   street?: string | null;
@@ -45,3 +42,39 @@ export interface CarouselEntity {
   tenantId: string;
   items: CarouselItem[];
 }
+
+export type MenuItemDto = {
+  id: number;
+  imageUrl: string;
+  name: string;
+  price: string;
+  description?: string;
+};
+export type MenuCategoryDto = {
+  id: number;
+  name: string;
+  sortOrder: number;
+  isVisible: boolean;
+  items: MenuItemDto[];
+};
+export type MenuDto = {
+  id: number;
+  tenantId?: string;
+  categories: MenuCategoryDto[];
+};
+
+export type MenuPatchDto = {
+  categories: Array<{
+    name: string;
+    sortOrder?: number;
+    isVisible?: boolean;
+    items: Array<{
+  imageUrl?: string;
+      name: string;
+      price: string;
+      description?: string;
+      sortOrder?: number;
+      isVisible?: boolean;
+    }>;
+  }>;
+};
