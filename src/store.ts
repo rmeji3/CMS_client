@@ -8,6 +8,7 @@ import { aboutApi } from './services/info/about';
 import { socialsApi } from './services/info/socials';
 import { addressApi } from './services/info/address';
 import { carouselApi } from './services/carousel/carousel';
+import { menuApi } from './services/menu/menu';
 
 export const store = configureStore({
   reducer: {
@@ -19,6 +20,7 @@ export const store = configureStore({
     [socialsApi.reducerPath]: socialsApi.reducer,
     [addressApi.reducerPath]: addressApi.reducer,
     [carouselApi.reducerPath]: carouselApi.reducer,
+    [menuApi.reducerPath]: menuApi.reducer,
   },
   // Adding the api middleware enables caching, invalidation, polling,
   // and other useful features of `rtk-query`.
@@ -30,7 +32,8 @@ export const store = configureStore({
       aboutApi.middleware,
       socialsApi.middleware,
       addressApi.middleware,
-      carouselApi.middleware
+      carouselApi.middleware,
+      menuApi.middleware,
     ),
 })
 
