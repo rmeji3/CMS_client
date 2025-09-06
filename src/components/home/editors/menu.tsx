@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { FaChevronDown } from "react-icons/fa";
 import { RxCross2 } from "react-icons/rx";
-import MenuItem from "./components/MenuItem";
+import MenuItem from "./components/menu/MenuItem";
 import type { MenuPatchDto } from "../../../services/types";
 import {
   useGetMenuQuery,
