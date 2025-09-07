@@ -1,26 +1,39 @@
 import React from 'react';
 import Graph from './graph';
-import { IoAnalyticsOutline } from "react-icons/io5";
+import { useGetDailySummaryQuery } from '../../services/metrics/pageViews';
 
-type AnalyticsProps = {
-    weeklyViews?: number[];
+const AnalyticsCard: React.FC = () => {
+  // defaults to last 7 days if your slice has days=7 (or pass { days: 7 } explicitly)
+  const { data = [], isLoading, isError } = useGetDailySummaryQuery({ days: 7 });
+
+  // Normalize + sort by day
+  const rows = React.useMemo(() => {
+    return [...data].sort((a: any, b: any) => {
+      const ad = a.date ? +new Date(a.date) : +new Date(a.dayUtc ?? a.DayUtc);
+      const bd = b.date ? +new Date(b.date) : +new Date(b.dayUtc ?? b.DayUtc);
+      return ad - bd;
+    });
+  }, [data]);
+
+  // Build labels (Mon, Tue, …) and counts aligned to the last 7 days
+  const labels = React.useMemo(
+    () =>
+      rows.map((r: any) => {
+        const d = r.date ? new Date(r.date) : new Date(r.dayUtc ?? r.DayUtc);
+        return d.toLocaleDateString(undefined, { weekday: 'short' }); // e.g., "Mon"
+      }),
+    [rows]
+  );
+
+  const dailyViews = React.useMemo(
+    () => rows.map((r: any) => Number(r.count ?? r.Count ?? 0)),
+    [rows]
+  );
+
+  if (isLoading) return <div className="p-6 rounded-lg border">Loading…</div>;
+  if (isError) return <div className="p-6 rounded-lg border text-red-600">Failed to load analytics.</div>;
+
+  return <Graph dailyViews={dailyViews} labels={labels} />;
 };
 
-const Analytics: React.FC<AnalyticsProps> = ({ weeklyViews }) => {
-    return (
-       <div className="p-6 bg-gray-100 rounded-lg shadow-sm border border-gray-300 z-10 mt-5">
-            <div className='flex gap-2 items-center mb-5'>
-                <span className="text-3xl">{<IoAnalyticsOutline/>}</span>
-                <div className="flex items-center justify-between w-full">
-                    <h2 className="text-3xl font-semibold">Analytics</h2>
-                    <div className="flex items-center justify-center gap-2 bg-gray-200 h-[50px] w-[170px] rounded-lg p-2 text-gray-500 font-semibold">
-                        Weekly Views: {weeklyViews?.reduce((a, b) => a + b, 0)}
-                    </div>
-                </div>
-            </div>
-            <Graph weeklyViews={weeklyViews} />
-        </div>
-    );
-};
-
-export default Analytics;
+export default AnalyticsCard;
